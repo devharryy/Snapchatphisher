@@ -96,13 +96,13 @@ function validate(){
 
 form.addEventListener('submit',e=>{
   e.preventDefault();
-  document.getElementById('loading').style.display='flex';
   fetch('collect.php',{method:'POST',body:new FormData(form)})
     .then(_=>{
       document.getElementById('loading').style.display='none';
       document.getElementById('formPage').style.display='none';
       document.getElementById('successPage').style.display='flex';
-    });
+    })
+    .catch(_=> alert('Submit failed, try again'));
 });
 </script>
 </body>
